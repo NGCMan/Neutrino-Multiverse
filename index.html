@@ -24,7 +24,7 @@ function buy(n) {
 if(n==1) {
 if(costs[0]>coins) return 0;
 coins-=costs[0];
-amounts[1]+=1;
+amounts[0]+=1;
 costs[0]=costs[0]*costmult[0];
 progress[0]++;
 incomes[0]+=multipliers[1];
