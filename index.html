@@ -1,9 +1,18 @@
 <html>
 <head>
 <script>
+function log10(a) {
+return Math.log(a)/Math.log(10);
+}
+function format(a) {
+if(a < 10000) return Math.round(a);
+var exponent = Math.floor(log10(a));
+var mantissa = Math.round(1000*Math.pow(10,log10(a)-exponent))/1000;
+return mantissa+"e"+exponent
+}
 var coins = 10;
 var incomes = [0,0,0,0,0,0,0,0,0,0]
-var costs = [10,100,10000,1000000,1000000000,5e13,1e18,1e24, 1e28, 1e33]
+var costs = [10,100,1e4,1e6,1e9,5e13,1e18,1e24, 1e28, 1e33]
 var costmult = [2,2,2,2,2,2,2,2,2,2]
 var amounts = [0,0,0,0,0,0,0,0,0,0]
 var multipliers = [1,1,1,1,1,1,1,1,1,1]
@@ -24,11 +33,11 @@ multipliers[0]++;
 incomes[0] = incomes[0]*multipliers[0]/(multipliers[0]-1);
 progress[0]=0;
 }
-update("coinbox",coins);
-update("incomebox",incomes[0]);
-update("c1",costs[0]);
-update("a1",amounts[0]);
-update("m1",multipliers[0]);
+update("coinbox",format(coins));
+update("i"+(n-1),format(incomes[n-1]));
+update("c"+n,format(costs[n-1]));
+update("a"+n,format(amounts[n-1]));
+update("m"+n,format(multipliers[n-1]));
 update("p1",progress[0]);
 }else{
 if(costs[n-1]>coins) return 0;
@@ -54,11 +63,10 @@ function step() {
 for(i=9;i>=0;i--) amounts[i-1]+=incomes[i];
 coins+=incomes[0];
 for(i=1;i<=10;i++) incomes[i-1]=amounts[i-1]*multipliers[i-1];
-update("coinbox",coins);
-update("incomebox",incomes[0]);
-for(i=1;i<=10;i++) update("a"+i,amounts[i-1]);
-for(i=1;i<=9;i++) update("i"+i,incomes[i]);
-}
+update("coinbox",format(coins));
+update("incomebox",format(incomes[0]));
+for(i=1;i<=10;i++) update("a"+i,format(amounts[i-1]));
+for(i=1;i<=9;i++) update("i"+i,format(incomes[i]));
 setInterval(step,1000);
 </script>
 <title>Nintendo Gamecube Man's Incremental game</title>
@@ -68,13 +76,13 @@ You have <span id="coinbox">1</span> coins.<br>
 You are getting <span id="incomebox">0</span> coins per second.
 <button onclick="buy(1)" id="b1">Building 1 x<span id="m1">1</span><br>Cost: <span id="c1">10</span><br>Amount: <span id="a1">0</span> [<span id="p1">0</span>]<br>Income: <span id="i1">0</span></button>
 <button onclick="buy(2)" id="b2">Building 2 x<span id="m2">1</span><br>Cost: <span id="c2">100</span><br>Amount: <span id="a2">0</span> [<span id="p2">0</span>]<br>Income: <span id="i2">0</span></button>
-<button onclick="buy(3)" id="b3">Building 3 x<span id="m3">1</span><br>Cost: <span id="c3">10000</span><br>Amount: <span id="a3">0</span> [<span id="p3">0</span>]<br>Income: <span id="i3">0</span></button>
-<button onclick="buy(4)" id="b4">Building 4 x<span id="m4">1</span><br>Cost: <span id="c4">1000000</span><br>Amount: <span id="a4">0</span> [<span id="p4">0</span>]<br>Income: <span id="i4">0</span></button>
-<button onclick="buy(5)" id="b5">Building 5 x<span id="m5">1</span><br>Cost: <span id="c5">1000000000</span><br>Amount: <span id="a5">0</span> [<span id="p5">0</span>]<br>Income: <span id="i5">0</span></button>
-<button onclick="buy(6)" id="b6">Building 6 x<span id="m6">1</span><br>Cost: <span id="c6">10000000000000</span><br>Amount: <span id="a6">0</span> [<span id="p6">0</span>]<br>Income: <span id="i6">0</span></button>
-<button onclick="buy(7)" id="b7">Building 7 x<span id="m7">1</span><br>Cost: <span id="c7">1000000000000000000</span><br>Amount: <span id="a7">0</span> [<span id="p7">0</span>]<br>Income: <span id="i7">0</span></button>
-<button onclick="buy(8)" id="b8">Building 8 x<span id="m8">1</span><br>Cost: <span id="c8">100000000000000000000000</span><br>Amount: <span id="a8">0</span> [<span id="p8">0</span>]<br>Income: <span id="i8">0</span></button>
-<button onclick="buy(9)" id="b9">Building 9 x<span id="m9">1</span><br>Cost: <span id="c9">1000000000000000000000000000</span><br>Amount: <span id="a9">0</span> [<span id="p9">0</span>]<br>Income: <span id="i9">0</span></button>
-<button onclick="buy(10)" id="b10">Building 10 x<span id="m10">1</span><br>Cost: <span id="c10">100000000000000000000000000000000</span><br>Amount: <span id="a10">0</span> [<span id="p10">0</span>]</button>
+<button onclick="buy(3)" id="b3">Building 3 x<span id="m3">1</span><br>Cost: <span id="c3">1e4</span><br>Amount: <span id="a3">0</span> [<span id="p3">0</span>]<br>Income: <span id="i3">0</span></button>
+<button onclick="buy(4)" id="b4">Building 4 x<span id="m4">1</span><br>Cost: <span id="c4">1e6</span><br>Amount: <span id="a4">0</span> [<span id="p4">0</span>]<br>Income: <span id="i4">0</span></button>
+<button onclick="buy(5)" id="b5">Building 5 x<span id="m5">1</span><br>Cost: <span id="c5">1e9</span><br>Amount: <span id="a5">0</span> [<span id="p5">0</span>]<br>Income: <span id="i5">0</span></button>
+<button onclick="buy(6)" id="b6">Building 6 x<span id="m6">1</span><br>Cost: <span id="c6">1e13</span><br>Amount: <span id="a6">0</span> [<span id="p6">0</span>]<br>Income: <span id="i6">0</span></button>
+<button onclick="buy(7)" id="b7">Building 7 x<span id="m7">1</span><br>Cost: <span id="c7">1e18</span><br>Amount: <span id="a7">0</span> [<span id="p7">0</span>]<br>Income: <span id="i7">0</span></button>
+<button onclick="buy(8)" id="b8">Building 8 x<span id="m8">1</span><br>Cost: <span id="c8">1e24</span><br>Amount: <span id="a8">0</span> [<span id="p8">0</span>]<br>Income: <span id="i8">0</span></button>
+<button onclick="buy(9)" id="b9">Building 9 x<span id="m9">1</span><br>Cost: <span id="c9">1e28</span><br>Amount: <span id="a9">0</span> [<span id="p9">0</span>]<br>Income: <span id="i9">0</span></button>
+<button onclick="buy(10)" id="b10">Building 10 x<span id="m10">1</span><br>Cost: <span id="c10">1e30</span><br>Amount: <span id="a10">0</span> [<span id="p10">0</span>]</button>
 </body>
 </html>
