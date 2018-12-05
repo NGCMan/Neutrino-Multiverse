@@ -111,7 +111,9 @@ progress = JSON.parse(localStorage.getItem('progress'));
 <body>
 You have <span id="coinbox">1</span> coins.<br>
 You are getting <span id="incomebox">0</span> coins per second.
-<button onclick="buy(1)" id="b1">Building 1 x<span id="m1">1</span><br>Cost: <span id="c1">1</span><br>Amount: <span id="a1">0</span> [<span id="p1">0</span>]<br>Income: <span id="i1">0</span></button>
+<button onclick="save();">Save</button>
+<button onclick="load();">Load</button>
+	<button onclick="buy(1)" id="b1">Building 1 x<span id="m1">1</span><br>Cost: <span id="c1">1</span><br>Amount: <span id="a1">0</span> [<span id="p1">0</span>]<br>Income: <span id="i1">0</span></button>
 <button onclick="buy(2)" id="b2">Building 2 x<span id="m2">1</span><br>Cost: <span id="c2">100</span><br>Amount: <span id="a2">0</span> [<span id="p2">0</span>]<br>Income: <span id="i2">0</span></button>
 <button onclick="buy(3)" id="b3">Building 3 x<span id="m3">1</span><br>Cost: <span id="c3">1e4</span><br>Amount: <span id="a3">0</span> [<span id="p3">0</span>]<br>Income: <span id="i3">0</span></button>
 <button onclick="buy(4)" id="b4">Building 4 x<span id="m4">1</span><br>Cost: <span id="c4">1e6</span><br>Amount: <span id="a4">0</span> [<span id="p4">0</span>]<br>Income: <span id="i4">0</span></button>
