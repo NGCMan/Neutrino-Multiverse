@@ -70,7 +70,42 @@ for(i=1;i<=19;i++) update("a"+i,format(amounts[i-1]));
 for(i=1;i<=20;i++) update("i"+i,format(incomes[i]));
 }
 setInterval(step,1000);
-</script>
+function save() {
+
+localStorage.setItem('coins', JSON.stringify(coins));
+
+localStorage.setItem('incomes', JSON.stringify(incomes));
+
+localStorage.setItem('costs', JSON.stringify(costs));
+
+localStorage.setItem('costmult', JSON.stringify(costmult));
+
+localStorage.setItem('amounts', JSON.stringify(amounts));
+
+localStorage.setItem('multipliers', JSON.stringify(multipliers));
+
+localStorage.setItem('progress', JSON.stringify(progress));
+
+}
+
+function load() {
+
+coins = JSON.parse(localStorage.getItem('coins'));
+
+incomes = JSON.parse(localStorage.getItem('incomes'));
+
+costs = JSON.parse(localStorage.getItem('costs'));
+
+costmult = JSON.parse(localStorage.getItem('costmult'));
+
+amounts = JSON.parse(localStorage.getItem('amounts'));
+
+multipliers = JSON.parse(localStorage.getItem('multipliers'));
+
+progress = JSON.parse(localStorage.getItem('progress'));
+
+}
+	</script>
 <title>NGC Man's Incremental game</title>
 </head>
 <body>
