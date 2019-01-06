@@ -6,11 +6,14 @@ function log10(a) {
 return Math.log(a)/Math.log(10);
 }
 function format(a) {
-if(a < 1000) return Math.round(a);
-var exponent = Math.floor(log10(a));
-var mantissa = Math.round(1000*Math.pow(10,log10(a)-exponent))/1000;
-return mantissa+"e"+exponent
-}
+	a = new Decimal(a)
+	if (a.lte(9999.5)) return a.toFixed(3)
+	var m = a.mantissaWithDecimalPlaces(3)
+	var e = a.e
+	if (m>9.9995) {
+		m = 1
+		e++
+	}
 var coins = new Decimal(1);
 var incomes = [new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)]
 var costs = [new Decimal(1),new Decimal(100),new Decimal(1e4),new Decimal(1e6),new Decimal(1e9),new Decimal(1e13),new Decimal(1e18),new Decimal(1e24),new Decimal(1e28),new Decimal(1e30),new Decimal(1e34),new Decimal(1e39),new Decimal(1e44),new Decimal(1e49),new Decimal(1e55),new Decimal(1e60),new Decimal(1e66),new Decimal(1e71),new Decimal(1e79),new Decimal(1e86),new Decimal(1e93),new Decimal(1e100),new Decimal(1e107),new Decimal(1e114),new Decimal(1e121),new Decimal(1e128),new Decimal(1e135),new Decimal(1e142),new Decimal(1e149),new Decimal(1e156),new Decimal(1e164),new Decimal(1e172),new Decimal(1e180),new Decimal(1e188),new Decimal(1e196),new Decimal(1e204),new Decimal(1e212),new Decimal(1e220),new Decimal(1e228),new Decimal(1e236),new Decimal(1e245),new Decimal(1e254),new Decimal(1e263),new Decimal(1e272),new Decimal(1e281),new Decimal(1e290),new Decimal(1e299),new Decimal(1e308),new Decimal(1e317),new Decimal(1e326)]
