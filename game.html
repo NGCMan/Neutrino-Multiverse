@@ -1,174 +1,335 @@
 <html>
 <head>
-<script type="text/javascript" src="break_infinity.js"></script>
+<script type="text/javascript" src="breakinfinity.js"></script>
 <script>
-function log10(a) {
-return Math.log(a)/Math.log(10);
+var game = {
+	coins:new Decimal(1),
+	incomes:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+	costs:[new Decimal(1),new Decimal(100),new Decimal(1e4),new Decimal(1e7),new Decimal(1e10),new Decimal(1e14),new Decimal(1e18),new Decimal(1e23)],
+	costmult:[2,3,4,6,10,15,25,40],
+	amounts:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+	multipliers:[new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1)],
+	progress:[0,0,0,0,0,0,0,0],
+	totalCoins:new Decimal(0),
+	prestigeCount:0,
+	boost:new Decimal(1),
+	notation:0,
+	time:new Date().getTime(),
+	upgradeCoins:new Decimal(0),
+	upgrades:[],
+	achievements:[]
+}
+var notationArray = ["Standard","Scientific","Engineering","Logarithm"]
+
+function abbreviate(i) {
+	if(i==0) return "K"
+	if(i==1) return "M"
+	if(i==2) return "B"
+	var units = ["","U","Du","T","Q","Qi","S","Sp","O","N"]
+	var tens = ["","D","V","Tg","Qg","Qig","Sg","SPg","Og","Ng"]
+	var hundreds = ["","C","Dc","Tc","Qc","Qic","Sc","Spc","Oc","Nc"]
+	var i2=Math.floor(i/10)
+	var i3=Math.floor(i2/10)
+	var unit = units[i%10]
+	var ten = tens[i2%10]
+	var hundred = hundreds[i3%10]
+	return unit+ten+hundred
+}
+function displayTime(s) {
+	if (s < 10) return Math.floor(s*1000) + " milliseconds."
+	if (s < 60) return Math.floor(s*100)/100 + " seconds."
+	if (s < 3600) return Math.floor(s/60) + " minutes, " + Math.floor(s)%60 + " seconds."
+	return format(Math.floor(s/3600)) + " hours, " + Math.floor(s/60)%60 + " minutes, " + Math.floor(s)%60 + " seconds."
 }
 function format(a) {
-if(a < 1000) return Math.round(a);
-var exponent = Math.floor(log10(a));
-var mantissa = Math.round(1000*Math.pow(10,log10(a)-exponent))/1000;
-return mantissa+"e"+exponent
+	a = new Decimal(a)
+	if (a.lte(9999.5)) return a.toFixed(3)
+	if (game.notation==1) return a.toExponential(3).replace("e+","e")
+	if (game.notation==3) return "e"+Math.round(1000*a.log10())/1000
+	var m = a.mantissaWithDecimalPlaces(3)
+	var e = a.e
+	if (m>9.9995) {
+		m = 1
+		e++
+	}
+	var exponent2 = 3*Math.floor(e/3)
+	var mantissa2 = Math.round(1000*m*Math.pow(10,e-exponent2))/1000
+	if(game.notation==0) return mantissa2+abbreviate(exponent2/3-1)
+	if(game.notation==2) return mantissa2+"e"+exponent2
 }
-var coins = 1;
-var incomes = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-var costs = [1,100,1e4,1e6,1e9,1e13,1e18,1e24,1e28,1e30,1e34,1e39,1e44,1e49,1e55,1e60,1e66,1e71,1e79,1e86,1e93,1e100,1e107,1e114,1e121,1e128,1e135,1e142,1e149,1e156,1e164,1e172,1e180,1e188,1e196,1e204,1e212,1e220,1e228,1e236,1e245,1e254,1e263,1e272,1e281,1e290,1e299,1e308,1e317,1e326]
-var costmult = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
-var amounts = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-var multipliers = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-var progress = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 function update(set,get){
 	document.getElementById(set).innerHTML=get
 }
+function showElement(elementID) {
+	document.getElementById(elementID).style.display="inline-block"
+}
+function hideElement(elementID) {
+	document.getElementById(elementID).style.display="none"
+}
+function getAch(ach) {
+	if (game.achievements.includes(ach)) return false
+	game.achievements.push(ach)
+}
+function getprestige() {
+	var product = new Decimal(0.01)
+	for(var i=0;i<=7;i++) product = product.mul(game.amounts[i].pow(0.025))
+	return product
+}
+function getUC() {
+	return game.coins.div(1e63).pow(0.03).floor()
+}
+function prestige() {
+	game = {
+		coins:new Decimal(1),
+		incomes:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+		costs:[new Decimal(1),new Decimal(100),new Decimal(1e4),new Decimal(1e7),new Decimal(1e10),new Decimal(1e14),new Decimal(1e18),new Decimal(1e23)],
+		costmult:[2,3,4,6,10,15,25,40],
+		amounts:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+		multipliers:[getprestige(),getprestige(),getprestige(),getprestige(),getprestige(),getprestige(),getprestige(),getprestige()],
+		progress:[0,0,0,0,0,0,0,0],
+		prestigeCount:game.prestigeCount+1,
+		boost:getprestige(),
+		notation:game.notation,
+		time:game.time,
+		timePlayed:game.timePlayed,
+		totalCoins:game.totalCoins,
+		upgradeCoins:game.upgradeCoins,
+		upgrades:game.upgrades,
+		achievements:game.achievements
+	}
+	showElement("prestigeInfo")
+	update("prestigeBoost",format(game.boost))
+	hideElement("prestigeButton")
+}
+function upgrade() {
+	game = {
+		coins:new Decimal(1),
+		incomes:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+		costs:[new Decimal(1),new Decimal(100),new Decimal(1e4),new Decimal(1e7),new Decimal(1e10),new Decimal(1e14),new Decimal(1e18),new Decimal(1e23)],
+		costmult:[2,3,4,6,10,15,25,40],
+		amounts:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+		multipliers:[new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1)],
+		progress:[0,0,0,0,0,0,0,0],
+		prestigeCount:0,
+		boost:new Decimal(1),
+		notation:game.notation,
+		time:game.time,
+		timePlayed:game.timePlayed,
+		totalCoins:game.totalCoins,
+		upgradeCoins:game.upgradeCoins.add(getUC()),
+		upgrades:game.upgrades,
+		achievements:game.achievements
+	}
+	hideElement("UCButton")
+}
+function hardReset() {
+	if(confirm("Are you sure you want to hard reset? This will erase all your progress.")) {
+		game = {
+			coins:new Decimal(1),
+			incomes:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+			costs:[new Decimal(1),new Decimal(100),new Decimal(1e4),new Decimal(1e7),new Decimal(1e10),new Decimal(1e14),new Decimal(1e18),new Decimal(1e23)],
+			costmult:[2,3,4,6,10,15,25,40],
+			amounts:[new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)],
+			multipliers:[new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1)],
+			progress:[0,0,0,0,0,0,0,0],
+			totalCoins:new Decimal(0),
+			prestigeCount:0,
+			boost:new Decimal(1),
+			notation:0,
+			time:new Date().getTime(),
+			upgradeCoins:new Decimal(0),
+			upgrades:[],
+			achievements:[]
+		}
+	hideElement("prestigeInfo")
+	hideElement("UCButton")
+	}
+}
 function buy(n) {
-if(n==1) {
-if(costs[0]>coins) return 0;
-coins-=costs[0];
-amounts[0]+=1;
-costs[0]=costs[0]*costmult[0];
-progress[0]++;
-incomes[0]+=multipliers[1];
-if(progress[0]==10) {
-multipliers[0]*=1.5;
-incomes[0] = incomes[0]*1.5;
-progress[0]=0;
-}
-update("coinbox",format(coins));
-update("incomebox",format(incomes[0]));
-update("c1",format(costs[0]));
-update("a1",format(amounts[0]));
-update("m1",format(multipliers[0]));
-update("p1",progress[0]);
-}else{
-if(costs[n-1]>coins) return 0;
-coins-=costs[n-1];
-amounts[n-1]+=1;
-costs[n-1]=costs[n-1]*costmult[n-1];
-progress[n-1]++;
-incomes[n-1]+=multipliers[n-1];
-if(progress[n-1]==10) {
-multipliers[n-1]*=1.5;
-progress[n-1]=0;
-incomes[n-1] = incomes[n-1]*1.5;
-}
-update("coinbox",format(coins));
-update("i"+(n-1),format(incomes[n-1]));
-update("c"+n,format(costs[n-1]));
-update("a"+n,format(amounts[n-1]));
-update("m"+n,format(multipliers[n-1]));
-update("p"+n,progress[n-1]);
-}
+	if(n==1) {
+		if(game.costs[0].gt(game.coins)) return 0
+		game.coins = game.coins.sub(game.costs[0])
+		game.amounts[0] = game.amounts[0].add(1)
+		game.costs[0]=game.costs[0].mul(game.costmult[0])
+		game.progress[0]++
+		game.incomes[0] = game.incomes[0].add(game.multipliers[0])
+		if(game.progress[0]==8) {
+			game.multipliers[0] = game.multipliers[0].mul(1.5)
+			game.incomes[0] = game.incomes[0].mul(1.5)
+			game.progress[0]=0
+		}
+		update("coinbox",format(game.coins))
+		update("incomebox",format(game.incomes[0]))
+		update("c1",format(game.costs[0]))
+		update("a1",format(game.amounts[0]))
+		update("m1",format(game.multipliers[0]))
+		update("p1",game.progress[0])
+	}else{
+		if(game.costs[n-1].gt(game.coins)) return 0
+		game.coins = game.coins.sub(game.costs[n-1])
+		game.amounts[n-1] = game.amounts[n-1].add(1)
+		game.costs[n-1]= game.costs[n-1].mul(game.costmult[n-1])
+		game.progress[n-1]++
+		game.incomes[n-1] = game.incomes[n-1].add(game.multipliers[n-1])
+		if(game.progress[n-1]==8) {
+			game.multipliers[n-1] = game.multipliers[n-1].mul(1.5)
+			game.progress[n-1]=0
+			game.incomes[n-1] = game.incomes[n-1].mul(1.5)
+		}
+		update("coinbox",format(game.coins))
+		update("i"+(n-1),format(game.incomes[n-1]))
+		update("c"+n,format(game.costs[n-1]))
+		update("a"+n,format(game.amounts[n-1]))
+		update("m"+n,format(game.multipliers[n-1]))
+		update("p"+n,game.progress[n-1])
+	}
 }
 function step() {
-for(i=49;i>=0;i--) amounts[i-1]+=incomes[i];
-coins+=incomes[0];
-for(i=1;i<=50;i++) incomes[i-1]=amounts[i-1]*multipliers[i-1];
-update("coinbox",format(coins));
-update("incomebox",format(incomes[0]));
-for(i=1;i<=49;i++) update("a"+i,format(amounts[i-1]));
-for(i=1;i<=50;i++) update("i"+i,format(incomes[i]));
+	const s = (new Date().getTime()-game.time)/1000
+	game.time = new Date().getTime()
+	game.timePlayed+=s
+	for(let i=7;i>=1;i--) game.amounts[i-1] = game.amounts[i-1].add(game.incomes[i].mul(s))
+ 	game.coins = game.coins.add(game.incomes[0].mul(s))
+	game.totalCoins = game.totalCoins.add(game.incomes[0].mul(s))
+	for(let i=1;i<=8;i++) game.incomes[i-1] = game.amounts[i-1].mul(game.multipliers[i-1])
+	update("coinbox",format(game.coins))
+	update("incomebox",format(game.incomes[0]))
+	for(let i=1;i<=8;i++) {
+		update("a"+i,format(game.amounts[i-1]))
+		update("c"+i,format(game.costs[i-1]))
+		update("m"+i,format(game.multipliers[i-1]))
+		update("p"+i,game.progress[i-1])
+	}
+	for(let i=1;i<=7;i++) update("i"+i,format(game.incomes[i]))
+	update("totalCoinDisplay",format(game.totalCoins))
+	update("playTime",displayTime(game.timePlayed))
+	update("prestigeTimes",game.prestigeCount)
+	getprestige()
+	update("prestmult",format(getprestige().div(game.boost)))
+	if(game.boost.gt(1)) showElement("prestigeInfo")
+	update("prestigeBoost",format(game.boost))
+	if(getprestige().div(game.boost).gte(1)) document.getElementById("prestigeButton").style.display = "inline-block"
+	//if(game.coins.gte(1e63)) showElement("UCButton")
+	update("UCAmount",getUC())
 }
-setInterval(step,1000);
+function switchNotation() {
+	game.notation++
+	if(game.notation>notationArray.length-1) game.notation=0
+	update("notationID",notationArray[game.notation])
+}
 function save() {
-localStorage.setItem('coins', JSON.stringify(coins));
-localStorage.setItem('incomes', JSON.stringify(incomes));
-localStorage.setItem('costs', JSON.stringify(costs));
-localStorage.setItem('costmult', JSON.stringify(costmult));
-localStorage.setItem('amounts', JSON.stringify(amounts));
-localStorage.setItem('multipliers', JSON.stringify(multipliers));
-localStorage.setItem('progress', JSON.stringify(progress));
+	localStorage.setItem('save',btoa(JSON.stringify(game)))
 }
-function load() {
-coins = JSON.parse(localStorage.getItem('coins'));
-incomes = JSON.parse(localStorage.getItem('incomes'));
-costs = JSON.parse(localStorage.getItem('costs'));
-costmult = JSON.parse(localStorage.getItem('costmult'));
-amounts = JSON.parse(localStorage.getItem('amounts'));
-multipliers = JSON.parse(localStorage.getItem('multipliers'));
-progress = JSON.parse(localStorage.getItem('progress'));
+function load(save) {
+	try {
+		game=JSON.parse(atob(save))
+		
+		if (game.notations===undefined) game.notations=0
+		if (game.time===undefined) game.time=new Date().getTime()
+		if (game.timePlayed===undefined) game.timePlayed=0
+		if (game.upgradeCoins===undefined) game.upgradeCoins=new Decimal(0)
+		else game.upgradeCoins = new Decimal(game.upgradeCoins)
+		if (game.upgrades===undefined) game.upgrades=[]
+		if (game.achievements===undefined) game.achievements=[]
+		
+		for(let i=0;i<=7;i++) {
+			game.multipliers[i] = new Decimal(game.multipliers[i])
+			game.amounts[i] = new Decimal(game.amounts[i])
+			game.costs[i] = new Decimal(game.costs[i])
+			game.incomes[i] = new Decimal(game.incomes[i])
+		}
+		game.coins = new Decimal(game.coins)
+		game.totalCoins = new Decimal(game.totalCoins)
+		game.boost = new Decimal(game.boost)
+		
+		update("coinbox",format(game.coins))
+		update("incomebox",format(game.incomes[0]))
+		for(let i=1;i<=8;i++) {
+			update("a"+i,format(game.amounts[i-1]))
+			update("c"+i,format(game.costs[i-1]))
+			update("m"+i,format(game.multipliers[i-1]))
+			update("p"+i,format(game.progress[i-1]))
+		}
+		for(let i=1;i<=7;i++) update("i"+i,format(game.incomes[i]))
+		update("notationID",notationArray[game.notation])
+		update("prestmult",getprestige())
+	} catch (e) {
+		console.log('Your save failed to load: '+e)
+	}
 }
-	</script>
-<style>
-button {
-  background-color: blue;
-  border: 2px solid black;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  border: 16px, solid;
+function exportGame() {
+	var savefile=btoa(JSON.stringify(game))
+	showElement("exportInfo")
+	document.getElementById("exportSave").value=btoa(JSON.stringify(game))
+}	
+function importGame() {
+	var input=prompt('Paste in your exported save and press enter.')
+	load(input)
 }
-body {
-  background-color: DarkGrey;
+function init() {
+	var tickspeed=0
+	var updated=true
+	if(localStorage.getItem('save')!=null) load(localStorage.getItem('save'))
+	setInterval(function(){
+		if (updated) {
+			updated=false
+			setTimeout(function(){
+				var time=new Date().getTime()
+				try {
+					step()
+				} catch (e) {
+					console.log('A game error has been occured: '+e)
+				}
+				tickspeed=tickspeed*0.8+(new Date().getTime()-time)*0.2
+				
+				updated=true
+			},tickspeed)
+		}
+	},0)
+	setInterval(save,10000)
 }
-coinbox {
-  font-family: Trebuchet MS;
+var tab="generators"
+function switchTab(tabName) {
+	hideElement(tab)
+	showElement(tabName)
+	tab=tabName
 }
-incomebox {
-  font-family: Trebuchet MS;
-}
-</style>
-<body>
-
-<title>NGC Man's Incremental game</title>
+</script>
+<title>Username's Incremental game</title>
 </head>
-<body>
-You have <span id="coinbox">1</span> coins.<br>
-You are getting <span id="incomebox">0</span> coins per second.
-<button onclick="save();">Save</button>
-<button onclick="load();">Load</button>
-	<button onclick="buy(1)" id="b1">Building 1 x<span id="m1">1</span><br>Cost: <span id="c1">1</span><br>Amount: <span id="a1">0</span> [<span id="p1">0</span>]<br>Income: <span id="i1">0</span></button>
-<button onclick="buy(2)" id="b2">Building 2 x<span id="m2">1</span><br>Cost: <span id="c2">100</span><br>Amount: <span id="a2">0</span> [<span id="p2">0</span>]<br>Income: <span id="i2">0</span></button>
-<button onclick="buy(3)" id="b3">Building 3 x<span id="m3">1</span><br>Cost: <span id="c3">1e4</span><br>Amount: <span id="a3">0</span> [<span id="p3">0</span>]<br>Income: <span id="i3">0</span></button>
-<button onclick="buy(4)" id="b4">Building 4 x<span id="m4">1</span><br>Cost: <span id="c4">1e6</span><br>Amount: <span id="a4">0</span> [<span id="p4">0</span>]<br>Income: <span id="i4">0</span></button>
-<button onclick="buy(5)" id="b5">Building 5 x<span id="m5">1</span><br>Cost: <span id="c5">1e9</span><br>Amount: <span id="a5">0</span> [<span id="p5">0</span>]<br>Income: <span id="i5">0</span></button>
-<button onclick="buy(6)" id="b6">Building 6 x<span id="m6">1</span><br>Cost: <span id="c6">1e13</span><br>Amount: <span id="a6">0</span> [<span id="p6">0</span>]<br>Income: <span id="i6">0</span></button>
-<button onclick="buy(7)" id="b7">Building 7 x<span id="m7">1</span><br>Cost: <span id="c7">1e18</span><br>Amount: <span id="a7">0</span> [<span id="p7">0</span>]<br>Income: <span id="i7">0</span></button>
-<button onclick="buy(8)" id="b8">Building 8 x<span id="m8">1</span><br>Cost: <span id="c8">1e24</span><br>Amount: <span id="a8">0</span> [<span id="p8">0</span>]<br>Income: <span id="i8">0</span></button>
-<button onclick="buy(9)" id="b9">Building 9 x<span id="m9">1</span><br>Cost: <span id="c9">1e28</span><br>Amount: <span id="a9">0</span> [<span id="p9">0</span>]<br>Income: <span id="i9">0</span></button>
-<button onclick="buy(10)" id="b10">Building 10 x<span id="m10">1</span><br>Cost: <span id="c10">1e30</span><br>Amount: <span id="a10">0</span> [<span id="p10">0</span>]<br>Income: <span id="i10">0</span></button>
-<button onclick="buy(11)" id="b11">Building 11 x<span id="m11">1</span><br>Cost: <span id="c11">1e34</span><br>Amount: <span id="a11">0</span> [<span id="p11">0</span>]<br>Income: <span id="i11">0</span></button>
-<button onclick="buy(12)" id="b12">Building 12 x<span id="m12">1</span><br>Cost: <span id="c12">1e39</span><br>Amount: <span id="a12">0</span> [<span id="p12">0</span>]<br>Income: <span id="i12">0</span></button>
-<button onclick="buy(13)" id="b13">Building 13 x<span id="m13">1</span><br>Cost: <span id="c13">1e44</span><br>Amount: <span id="a13">0</span> [<span id="p13">0</span>]<br>Income: <span id="i13">0</span></button>
-<button onclick="buy(14)" id="b14">Building 14 x<span id="m14">1</span><br>Cost: <span id="c14">1e49</span><br>Amount: <span id="a14">0</span> [<span id="p14">0</span>]<br>Income: <span id="i14">0</span></button>
-<button onclick="buy(15)" id="b15">Building 15 x<span id="m15">1</span><br>Cost: <span id="c15">1e55</span><br>Amount: <span id="a15">0</span> [<span id="p15">0</span>]<br>Income: <span id="i15">0</span></button>
-<button onclick="buy(16)" id="b16">Building 16 x<span id="m16">1</span><br>Cost: <span id="c16">1e60</span><br>Amount: <span id="a16">0</span> [<span id="p16">0</span>]<br>Income: <span id="i16">0</span></button>
-<button onclick="buy(17)" id="b17">Building 17 x<span id="m17">1</span><br>Cost: <span id="c17">1e66</span><br>Amount: <span id="a17">0</span> [<span id="p17">0</span>]<br>Income: <span id="i17">0</span></button>
-<button onclick="buy(18)" id="b18">Building 18 x<span id="m18">1</span><br>Cost: <span id="c18">1e71</span><br>Amount: <span id="a18">0</span> [<span id="p18">0</span>]<br>Income: <span id="i18">0</span></button>
-<button onclick="buy(19)" id="b19">Building 19 x<span id="m19">1</span><br>Cost: <span id="c19">1e79</span><br>Amount: <span id="a19">0</span> [<span id="p19">0</span>]<br>Income: <span id="i19">0</span></button>
-<button onclick="buy(20)" id="b20">Building 20 x<span id="m20">1</span><br>Cost: <span id="c20">1e86</span><br>Amount: <span id="a20">0</span> [<span id="p20">0</span>]<br>Income: <span id="i20">0</span></button>
-<button onclick="buy(21)" id="b21">Building 21 x<span id="m21">1</span><br>Cost: <span id="c21">1e93</span><br>Amount: <span id="a21">0</span> [<span id="p21">0</span>]<br>Income: <span id="i21">0</span></button>
-<button onclick="buy(22)" id="b22">Building 22 x<span id="m22">1</span><br>Cost: <span id="c22">1e100</span><br>Amount: <span id="a22">0</span> [<span id="p22">0</span>]<br>Income: <span id="i22">0</span></button>
-<button onclick="buy(23)" id="b23">Building 23 x<span id="m23">1</span><br>Cost: <span id="c23">1e107</span><br>Amount: <span id="a23">0</span> [<span id="p23">0</span>]<br>Income: <span id="i23">0</span></button>
-<button onclick="buy(24)" id="b24">Building 24 x<span id="m24">1</span><br>Cost: <span id="c24">1e114</span><br>Amount: <span id="a24">0</span> [<span id="p24">0</span>]<br>Income: <span id="i24">0</span></button>
-<button onclick="buy(25)" id="b25">Building 25 x<span id="m25">1</span><br>Cost: <span id="c25">1e121</span><br>Amount: <span id="a25">0</span> [<span id="p25">0</span>]<br>Income: <span id="i25">0</span></button>
-<button onclick="buy(26)" id="b26">Building 26 x<span id="m26">1</span><br>Cost: <span id="c26">1e128</span><br>Amount: <span id="a26">0</span> [<span id="p26">0</span>]<br>Income: <span id="i26">0</span></button>
-<button onclick="buy(27)" id="b27">Building 27 x<span id="m27">1</span><br>Cost: <span id="c27">1e135</span><br>Amount: <span id="a27">0</span> [<span id="p27">0</span>]<br>Income: <span id="i27">0</span></button>
-<button onclick="buy(28)" id="b28">Building 28 x<span id="m28">1</span><br>Cost: <span id="c28">1e142</span><br>Amount: <span id="a28">0</span> [<span id="p28">0</span>]<br>Income: <span id="i28">0</span></button>
-<button onclick="buy(29)" id="b29">Building 29 x<span id="m29">1</span><br>Cost: <span id="c29">1e149</span><br>Amount: <span id="a29">0</span> [<span id="p29">0</span>]<br>Income: <span id="i29">0</span></button>
-<button onclick="buy(30)" id="b30">Building 30 x<span id="m30">1</span><br>Cost: <span id="c30">1e156</span><br>Amount: <span id="a30">0</span> [<span id="p30">0</span>]<br>Income: <span id="i30">0</span></button>
-<button onclick="buy(31)" id="b31">Building 31 x<span id="m31">1</span><br>Cost: <span id="c31">1e164</span><br>Amount: <span id="a31">0</span> [<span id="p31">0</span>]<br>Income: <span id="i31">0</span></button>
-<button onclick="buy(32)" id="b32">Building 32 x<span id="m32">1</span><br>Cost: <span id="c32">1e172</span><br>Amount: <span id="a32">0</span> [<span id="p32">0</span>]<br>Income: <span id="i32">0</span></button>
-<button onclick="buy(33)" id="b33">Building 33 x<span id="m33">1</span><br>Cost: <span id="c33">1e180</span><br>Amount: <span id="a33">0</span> [<span id="p33">0</span>]<br>Income: <span id="i33">0</span></button>
-<button onclick="buy(34)" id="b34">Building 34 x<span id="m34">1</span><br>Cost: <span id="c34">1e188</span><br>Amount: <span id="a34">0</span> [<span id="p34">0</span>]<br>Income: <span id="i34">0</span></button>
-<button onclick="buy(35)" id="b35">Building 35 x<span id="m35">1</span><br>Cost: <span id="c35">1e196</span><br>Amount: <span id="a35">0</span> [<span id="p35">0</span>]<br>Income: <span id="i35">0</span></button>
-<button onclick="buy(36)" id="b36">Building 36 x<span id="m36">1</span><br>Cost: <span id="c36">1e204</span><br>Amount: <span id="a36">0</span> [<span id="p36">0</span>]<br>Income: <span id="i36">0</span></button>
-<button onclick="buy(37)" id="b37">Building 37 x<span id="m37">1</span><br>Cost: <span id="c37">1e212</span><br>Amount: <span id="a37">0</span> [<span id="p37">0</span>]<br>Income: <span id="i37">0</span></button>
-<button onclick="buy(38)" id="b38">Building 38 x<span id="m38">1</span><br>Cost: <span id="c38">1e220</span><br>Amount: <span id="a38">0</span> [<span id="p38">0</span>]<br>Income: <span id="i38">0</span></button>
-<button onclick="buy(39)" id="b39">Building 39 x<span id="m39">1</span><br>Cost: <span id="c39">1e228</span><br>Amount: <span id="a39">0</span> [<span id="p39">0</span>]<br>Income: <span id="i39">0</span></button>
-<button onclick="buy(40)" id="b40">Building 40 x<span id="m40">1</span><br>Cost: <span id="c40">1e236</span><br>Amount: <span id="a40">0</span> [<span id="p40">0</span>]<br>Income: <span id="i40">0</span></button>
-<button onclick="buy(41)" id="b41">Building 41 x<span id="m41">1</span><br>Cost: <span id="c41">1e245</span><br>Amount: <span id="a41">0</span> [<span id="p41">0</span>]<br>Income: <span id="i41">0</span></button>
-<button onclick="buy(42)" id="b42">Building 42 x<span id="m42">1</span><br>Cost: <span id="c42">1e254</span><br>Amount: <span id="a42">0</span> [<span id="p42">0</span>]<br>Income: <span id="i42">0</span></button>
-<button onclick="buy(43)" id="b43">Building 43 x<span id="m43">1</span><br>Cost: <span id="c43">1e263</span><br>Amount: <span id="a43">0</span> [<span id="p43">0</span>]<br>Income: <span id="i43">0</span></button>
-<button onclick="buy(44)" id="b44">Building 44 x<span id="m44">1</span><br>Cost: <span id="c44">1e272</span><br>Amount: <span id="a44">0</span> [<span id="p44">0</span>]<br>Income: <span id="i44">0</span></button>
-<button onclick="buy(45)" id="b45">Building 45 x<span id="m45">1</span><br>Cost: <span id="c45">1e281</span><br>Amount: <span id="a45">0</span> [<span id="p45">0</span>]<br>Income: <span id="i45">0</span></button>
-<button onclick="buy(46)" id="b46">Building 46 x<span id="m46">1</span><br>Cost: <span id="c46">1e290</span><br>Amount: <span id="a46">0</span> [<span id="p46">0</span>]<br>Income: <span id="i46">0</span></button>
-<button onclick="buy(47)" id="b47">Building 47 x<span id="m47">1</span><br>Cost: <span id="c47">1e299</span><br>Amount: <span id="a47">0</span> [<span id="p47">0</span>]<br>Income: <span id="i47">0</span></button>
-<button onclick="buy(48)" id="b48">Building 48 x<span id="m48">1</span><br>Cost: <span id="c48">1e308</span><br>Amount: <span id="a48">0</span> [<span id="p48">0</span>]<br>Income: <span id="i48">0</span></button>
-<button onclick="buy(49)" id="b49">Building 49 x<span id="m49">1</span><br>Cost: <span id="c49">1e317</span><br>Amount: <span id="a49">0</span> [<span id="p49">0</span>]<br>Income: <span id="i49">0</span></button>
-<button onclick="buy(50)" id="b50">Building 50 x<span id="m50">1</span><br>Cost: <span id="c40">1e326</span><br>Amount: <span id="a50">0</span> [<span id="p50">0</span>]<br>Income: <span id="i50">0</span></button>
-	</body>
+<body onload="init()">
+You have <b id="coinbox">1</b> coins.<br>
+You are getting <b id="incomebox">0</b> coins per second.<br>
+<button onclick="switchTab('generators')">Generators</button>
+<button onclick="switchTab('options')">Options</button>
+<button onclick="switchTab('stats')">Statistics</button>
+<br>
+<div id="generators" style="display:inline-block">
+<button onclick="buy(1)" id="b1">Level 1 x<span id="m1">1</span><br>Cost: <span id="c1">1</span><br>Amount: <span id="a1">0</span> [<span id="p1">0</span>]<br>Income: <span id="i1">0</span></button>
+<button onclick="buy(2)" id="b2">Level 2 x<span id="m2">1</span><br>Cost: <span id="c2">100</span><br>Amount: <span id="a2">0</span> [<span id="p2">0</span>]<br>Income: <span id="i2">0</span></button>
+<button onclick="buy(3)" id="b3">Level 3 x<span id="m3">1</span><br>Cost: <span id="c3">1e4</span><br>Amount: <span id="a3">0</span> [<span id="p3">0</span>]<br>Income: <span id="i3">0</span></button>
+<button onclick="buy(4)" id="b4">Level 4 x<span id="m4">1</span><br>Cost: <span id="c4">1e7</span><br>Amount: <span id="a4">0</span> [<span id="p4">0</span>]<br>Income: <span id="i4">0</span></button>
+<button onclick="buy(5)" id="b5">Level 5 x<span id="m5">1</span><br>Cost: <span id="c5">1e10</span><br>Amount: <span id="a5">0</span> [<span id="p5">0</span>]<br>Income: <span id="i5">0</span></button>
+<button onclick="buy(6)" id="b6">Level 6 x<span id="m6">1</span><br>Cost: <span id="c6">1e14</span><br>Amount: <span id="a6">0</span> [<span id="p6">0</span>]<br>Income: <span id="i6">0</span></button>
+<button onclick="buy(7)" id="b7">Level 7 x<span id="m7">1</span><br>Cost: <span id="c7">1e18</span><br>Amount: <span id="a7">0</span> [<span id="p7">0</span>]<br>Income: <span id="i7">0</span></button>
+<button onclick="buy(8)" id="b8">Level 8 x<span id="m8">1</span><br>Cost: <span id="c8">1e23</span><br>Amount: <span id="a8">0</span> [<span id="p8">0</span>]</button>
+<br><div id="prestigeInfo" style="display:none">You have x<span id="prestigeBoost">1</span> boost for all production from prestige.</div>
+<br><button onclick="prestige()" id="prestigeButton" style="display:none">Reset the game to get a production increase. x<span id="prestmult">1.000</span></button>
+<button id="UCButton" onclick="upgrade()" style="display:none">Transform your coins into upgrade coins to make the game faster. +<span id="UCAmount">0</span> UC</button>
+</div>
+<div id="options" style="display:none">
+<button onclick="save()">Save</button>
+<button onclick="importGame()">import</save>
+<button onclick="exportGame()">Export</button>
+<button onclick="switchNotation()">Notation: <div id="notationID">Standard</div></button>
+<button onclick="hardReset()">Reset the game</button>
+<span id="exportInfo" style="display:none">Here is your export save:<input id="exportSave"></input></span>
+</div>
+<div id="stats" style="display:none">
+You have made a total of <span id="totalCoinDisplay">0</span> coins.<br>
+You have played for <span id="playTime">0 seconds.</span><br>
+You have prestiged <span id="prestigeTimes">0</span> times.
+</div>
+<a style='position:fixed;bottom:0' href="https://discord.gg/ax4C3em">Discord</a>
+</body>
 </html>
