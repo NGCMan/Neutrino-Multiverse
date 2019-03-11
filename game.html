@@ -5,7 +5,11 @@
 function log10(a) {
 return Math.log(a)/Math.log(10);
 }
-function format(a) {
+function abbreviate(i) {
+	var i2=Math.floor(i/10);
+	var i3=Math.floor(i2/10);
+}
+	function format(a) {
 	a = new Decimal(a)
 	if (a.lte(9999.5)) return a.toFixed(3)
 	var m = a.mantissaWithDecimalPlaces(3)
@@ -16,6 +20,7 @@ function format(a) {
 	}
 	var exponent2 = 3*Math.floor(e/3);
 	var mantissa2 = Math.round(1000*m*Math.pow(10,e-exponent2))/1000;
+	if(game.notation==0) return mantissa2+abbreviate(exponent2/3-1)
 }
 var coins = new Decimal(1);
 var incomes = [new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)]
