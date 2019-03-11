@@ -22,6 +22,7 @@ function abbreviate(i) {
 	var mantissa2 = Math.round(1000*m*Math.pow(10,e-exponent2))/1000;
 	return mantissa2+abbreviate(exponent2/3-1)
 }
+	var game = {
 var coins = new Decimal(1);
 var incomes = [new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)]
 var costs = [new Decimal(1),new Decimal(100),new Decimal(1e4),new Decimal(1e6),new Decimal(1e9),new Decimal(1e13),new Decimal(1e18),new Decimal(1e24),new Decimal(1e28),new Decimal(1e30),new Decimal(1e34),new Decimal(1e39),new Decimal(1e44),new Decimal(1e49),new Decimal(1e55),new Decimal(1e60),new Decimal(1e66),new Decimal(1e71),new Decimal(1e79),new Decimal(1e86),new Decimal(1e93),new Decimal(1e100),new Decimal(1e107),new Decimal(1e114),new Decimal(1e121),new Decimal(1e128),new Decimal(1e135),new Decimal(1e142),new Decimal(1e149),new Decimal(1e156),new Decimal(1e164),new Decimal(1e172),new Decimal(1e180),new Decimal(1e188),new Decimal(1e196),new Decimal(1e204),new Decimal(1e212),new Decimal(1e220),new Decimal(1e228),new Decimal(1e236),new Decimal(1e245),new Decimal(1e254),new Decimal(1e263),new Decimal(1e272),new Decimal(1e281),new Decimal(1e290),new Decimal(1e299),new Decimal(1e308),new Decimal(1e317),new Decimal(1e326)]
@@ -29,7 +30,8 @@ var costmult = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 var amounts = [new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)]
 var multipliers = [new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1),new Decimal(1)]
 var progress = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-function update(set,get){
+	}
+		function update(set,get){
 	document.getElementById(set).innerHTML=get
 }
 function buy(n) {
@@ -72,13 +74,24 @@ update("p"+n,progress[n-1]);
 }
 }
 function step() {
-for(i=49;i>=0;i--) amounts[i-1]+=incomes[i];
-coins+=incomes[0];
-for(i=1;i<=50;i++) incomes[i-1]=amounts[i-1]*multipliers[i-1];
-update("coinbox",format(coins));
-update("incomebox",format(incomes[0]));
-for(i=1;i<=49;i++) update("a"+i,format(amounts[i-1]));
-for(i=1;i<=50;i++) update("i"+i,format(incomes[i]));
+	const s = (new Date().getTime()-game.time)/1000
+	game.time = new Date().getTime()
+	game.timePlayed+=s;
+	for(let i=49;i>=1;i--) game.amounts[i-1] = game.amounts[i-1].add(game.incomes[i].mul(s));
+ 	game.coins = game.coins.add(game.incomes[0].mul(s));
+	game.totalCoins = game.totalCoins.add(game.incomes[0].mul(s))
+	for(let i=1;i<=50;i++) game.incomes[i-1] = game.amounts[i-1].mul(game.multipliers[i-1]);
+	update("coinbox",format(game.coins));
+	update("incomebox",format(game.incomes[0]));
+	for(let i=1;i<=50;i++) {
+		update("a"+i,format(game.amounts[i-1]));
+		update("c"+i,format(game.costs[i-1]));
+		update("m"+i,format(game.multipliers[i-1]));
+		update("p"+i,game.progress[i-1]);
+	}
+	for(let i=1;i<=49;i++) update("i"+i,format(game.incomes[i]));
+	update("totalCoinDisplay",format(game.totalCoins));
+	update("playTime",displayTime(game.timePlayed));
 }
 setInterval(step,1000);
 function save() {
