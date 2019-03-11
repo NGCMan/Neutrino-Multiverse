@@ -2,30 +2,6 @@
 <head>
 <script type="text/javascript" src="break_infinity.js"></script>
 <script>
-var suffixes = "KMBTqQsSONdUD"
-function format(x) 
-{
-	var e = Math.floor(Math.log10(x) / 3) * 3
-	var m = x / Math.pow(10,e) 
-	if(x < 1000) return Math.round(x);
-	else if(x < 1e42)
-	{
-		m = Math.floor(m * 100) / 100;
-		return m + suffixes[Math.floor(e / 3) - 1];
-	}
-	else if(x < 1e1000000)
-	{
-                e = Math.floor(Math.log10(x));
-		m = Math.floor(m * 100) / 100;
-		return m + "e" + e;
-	}
-        else
-        {
-            e = Math.floor(Math.log10(x));
-            a = Math.floor(e * 1000) / 1000;
-            return "e" + a + suffixes[Math.floor(Math.log10(e) / 3) - 1];
-        }
-}
 //init
 var coins = new Decimal(1);
 var incomes = [new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)]
@@ -37,6 +13,34 @@ var progress = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 function update(set,get)
 {
 	document.getElementById(set).innerHTML=get
+}
+function abbreviate(i) {
+	if(i==0) return "K"
+	if(i==1) return "M"
+	if(i==2) return "B"
+	var units = ["","U","Du","T","Q","Qi","S","Sp","O","N"]
+	var tens = ["","D","V","Tg","Qg","Qig","Sg","SPg","Og","Ng"]
+	var hundreds = ["","C","Dc","Tc","Qc","Qic","Sc","Spc","Oc","Nc"]
+	var i2=Math.floor(i/10)
+	var i3=Math.floor(i2/10)
+	var unit = units[i%10]
+	var ten = tens[i2%10]
+	var hundred = hundreds[i3%10]
+	return unit+ten+hundred
+}
+	
+function format(a) {
+	a = new Decimal(a)
+	if (a.lte(9999.5)) return a.toFixed(3)
+	var m = a.mantissaWithDecimalPlaces(3)
+	var e = a.e
+	if (m>9.9995) {
+		m = 1
+		e++
+	}
+	var exponent2 = 3*Math.floor(e/3)
+	var mantissa2 = Math.round(1000*m*Math.pow(10,e-exponent2))/1000
+	return mantissa2+abbreviate(exponent2/3-1)
 }
 function buy(n) 
 {
