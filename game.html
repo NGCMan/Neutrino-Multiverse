@@ -35,18 +35,25 @@ var progress = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	document.getElementById(set).innerHTML=get
 }
 function buy(n) {
-if(n==1) {
-if(costs[0]>coins) return 0;
-coins-=costs[0];
-amounts[0]+=1;
-costs[0]=costs[0]*costmult[0];
-progress[0]++;
-incomes[0]+=multipliers[1];
-if(progress[0]==10) {
-multipliers[0]*=1.5;
-incomes[0] = incomes[0]*1.5;
-progress[0]=0;
-}
+	if(n==1) {
+		if(game.costs[0].gt(game.coins)) return 0;
+		game.coins = game.coins.sub(game.costs[0]);
+		game.amounts[0] = game.amounts[0].add(1);
+		game.costs[0]=game.costs[0].mul(game.costmult[0]);
+		game.progress[0]++;
+		game.incomes[0] = game.incomes[0].add(game.multipliers[0]);
+		if(game.progress[0]==8) {
+			game.multipliers[0] = game.multipliers[0].mul(1.5);
+			game.incomes[0] = game.incomes[0].mul(1.5);
+			game.progress[0]=0;
+		}
+		update("coinbox",format(game.coins));
+		update("incomebox",format(game.incomes[0]));
+		update("c1",format(game.costs[0]));
+		update("a1",format(game.amounts[0]));
+		update("m1",format(game.multipliers[0]));
+		update("p1",game.progress[0]);
+	}
 update("coinbox",format(coins));
 update("incomebox",format(incomes[0]));
 update("c1",format(costs[0]));
