@@ -20,7 +20,7 @@ function abbreviate(i) {
 	}
 	var exponent2 = 3*Math.floor(e/3);
 	var mantissa2 = Math.round(1000*m*Math.pow(10,e-exponent2))/1000;
-	if(game.notation==0) return mantissa2+abbreviate(exponent2/3-1)
+	return mantissa2+abbreviate(exponent2/3-1)
 }
 var coins = new Decimal(1);
 var incomes = [new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0),new Decimal(0)]
