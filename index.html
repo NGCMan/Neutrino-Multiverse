@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+	<head>
+		<script src="break-eternity.js"></script>
+		<script src="main.js"></script>
+		<script src="save.js"></script>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+	</head>
+	<body onload="start()">
+		<button id="thinkerTab" onclick="showTab('thinkers')" class="storebtn tabbtn">Thinkers</button>
+		<button id="settingsTab" onclick="showTab('settings')" class="storebtn tabbtn">Settings</button>
+		<div id="thinkers" class="tab">
+			<p>You have <span id="ideas">10</span> ideas</p>
+			<button onclick="maxAll(true)" id="weakMaxAll" style="display: none" class="storebtn">Max all thinkers under tier 7</button>
+			<button onclick="maxAll(false)" class="storebtn">Max all</button>
+			<table style="width:100%">
+				<tbody id="parent">
+					<tr id="tier1">
+						<td>
+							Tier 1 thinkers (<span id="tier1Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier1Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier1" onclick="buyTier(1)" align="right">Cost: <span id="tier1Cost">10</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier1" onclick="buyMaxTier(1)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier2" style="display: none">
+						<td>
+							Tier 2 thinkers (<span id="tier2Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier2Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier2" onclick="buyTier(2)" align="right">Cost: <span id="tier2Cost">100</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier2" onclick="buyMaxTier(2)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier3" style="display: none">
+						<td>
+							Tier 3 thinkers (<span id="tier3Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier3Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier3" onclick="buyTier(3)" align="right">Cost: <span id="tier3Cost">10000</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier3" onclick="buyMaxTier(3)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier4" style="display: none">
+						<td>
+							Tier 4 thinkers (<span id="tier4Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier4Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier4" onclick="buyTier(4)" align="right">Cost: <span id="tier4Cost">1000000</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier4" onclick="buyMaxTier(4)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier5" style="display: none">
+						<td>
+							Tier 5 thinkers (<span id="tier5Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier5Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier5" onclick="buyTier(5)" align="right">Cost: <span id="tier5Cost">1e9</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier5" onclick="buyMaxTier(5)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier6" style="display: none">
+						<td>
+							Tier 6 thinkers (<span id="tier6Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier6Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier6" onclick="buyTier(6)" align="right">Cost: <span id="tier6Cost">1e11</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier6" onclick="buyMaxTier(6)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier7" style="display: none">
+						<td>
+							Tier 7 thinkers (<span id="tier7Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier7Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier7" onclick="buyTier(7)" align="right">Cost: <span id="tier7Cost">1e14</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier7" onclick="buyMaxTier(7)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier8" style="display: none">
+						<td>
+							Tier 8 thinkers (<span id="tier8Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier8Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier8" onclick="buyTier(8)" align="right">Cost: <span id="tier8Cost">1e18</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier8" onclick="buyMaxTier(8)" align="right">Buy Max</button>
+						</td>
+					</tr>
+					<tr id="tier9" style="display: none">
+						<td>
+							Tier 9 thinkers (<span id="tier9Amount">0</span>)
+						</td>
+						<td>
+							x<span id="tier9Mult">1</span>
+						</td>
+						<td>
+							<button id="buy1Tier9" onclick="buyTier(9)" align="right">Cost: <span id="tier9Cost">1e23</span> ideas</button>
+						</td>
+						<td align="right">
+							<button id="buyMaxTier9" onclick="buyMaxTier(9)" align="right">Buy Max</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<button class="creationbtn" style="display: none; margin: auto;" onclick="creation()" id="creation">Unlock a building.</button>
+		</div>
+		<div id="settings" class="tab" style="display: none">
+			<button id="saveButton" onclick="save()" class="storebtn">Save</button>
+			<button id="loadButton" onclick="load()" class="storebtn">Load</button>
+			<button id="exportButton" onclick="exp()" class="storebtn">Export</button>
+			<button id="importButton" onclick="imp()" class="storebtn">Import</button>
+			<button id="resetButton" onclick="reset()" class="storebtn">Reset</button>
+			<div style="display:none;position:fixed;left:0;top:0"><textarea id="exportOutput" style="color:black; width: 200px; height: 55px;"></textarea></div>
+
+		</div>
+	</body>
+</html>

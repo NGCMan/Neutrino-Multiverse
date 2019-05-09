@@ -1,0 +1,68 @@
+td, button, p {
+	font-family: Consolas,monaco,monospace;
+}
+button {
+	padding: 1px 6px;
+	font-family: Consolas,monaco,monospace;
+}
+.storebtn {
+	color: black;
+	background: #F0F0F0;
+	border: 1px solid #12207A;
+	transition-duration: 0.2s;
+	cursor: pointer;
+	border-radius: 4px;
+	font-size: 13px;
+	vertical-align: top;
+}
+
+
+.storebtn:hover {
+	color: #FFFFFF;
+	background: #5A67C4;
+}
+
+.tabbtn {
+	font-weight: bold;
+	font-size: large;
+}
+.storebtnlocked {
+	
+	color: black;
+	background: #7c8dad;
+	border: 1px solid #443284;
+	transition-duration: 0.2s;
+	cursor: pointer;
+	border-radius: 4px;
+	font-size: 13px;
+	vertical-align: top;
+}
+
+.storebtnlocked:hover {
+	color: #000000;
+	background: #443284;
+}
+.creationbtn {
+	color: #FFFFFF;
+	background: #000055;
+	border-radius: 4px;
+	transition-duration: 0.2s;
+	border: 1px solid #000055;
+	cursor: pointer;
+}
+
+.creationbtn:hover {
+	color: #000000;
+	background: #FFFFFF;
+}
+.upgradebtn {
+	
+	width: 190px;
+	height: 90px;
+}
+.upgradebought {
+	color: black;
+	background: #5AC467;
+	border: 1px solid #ED85DF;
+	border-radius: 4px;
+}
