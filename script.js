@@ -1,5 +1,5 @@
-neutrinos = bigNumber(0)
-building1 = bigNumber(0)
+neutrinos = new Decimal(0)
+building1 = new Decimal(0)
 document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";
 function increment() {
