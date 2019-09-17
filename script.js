@@ -8,7 +8,7 @@ multiplier2 = new Decimal(1)
 document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";
 function increment() {
-  neutrinos = neutrinos.plus(building1).times(multiplier1).plus(1);
+  neutrinos = neutrinos.plus(building1.times(multiplier1)).plus(1);
   building1 = building1.plus(building2).times(multiplier2)
   document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";document.getElementById("building1").innerHTML =
