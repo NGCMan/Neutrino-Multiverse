@@ -11,7 +11,9 @@ function increment() {
   neutrinos = neutrinos.plus(building1).plus(1);
   building1 = building1.plus(building2)
   document.getElementById("display").innerHTML =
-"You have " + neutrinos + " neutrinos.";
+"You have " + neutrinos + " neutrinos.";document.getElementById("building1").innerHTML =
+"You have " + building1 + " 1st buildings." + " x" + multiplier1 + ", " + cost1;document.getElementById("building2").innerHTML =
+"You have " + building2 + " 2nd buildings." + " x" + multiplier2 + ", " + cost2;
 }
 function buy1() {
   if (neutrinos>=cost1) {
@@ -21,7 +23,8 @@ function buy1() {
     cost1 = cost1.times(1.15)
        document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";document.getElementById("building1").innerHTML =
-"You have " + building1 + " 1st buildings." + " x" + multiplier1 + ", " + cost1;
+"You have " + building1 + " 1st buildings." + " x" + multiplier1 + ", " + cost1;document.getElementById("building2").innerHTML =
+"You have " + building2 + " 2nd buildings." + " x" + multiplier2 + ", " + cost2;
   }
 }
 function buy2() {
