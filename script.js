@@ -9,7 +9,7 @@ document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";
 function increment() {
   neutrinos = neutrinos.plus(building1.times(multiplier1)).plus(1);
-  building1 = building1.plus(building2).times(multiplier2)
+  building1 = building1.plus(building2.times(multiplier2))
   document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";document.getElementById("building1").innerHTML =
 "You have " + building1 + " 1st buildings." + " x" + multiplier1 + ", " + cost1;document.getElementById("building2").innerHTML =
