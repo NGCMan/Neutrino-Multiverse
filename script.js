@@ -4,7 +4,7 @@ cost1 = new Decimal(10)
 multiplier1 = new Decimal(1)
 building2 = new Decimal(0)
 cost2 = new Decimal(100)
-multiplier 2 = new Decimal(1)
+multiplier2 = new Decimal(1)
 document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";
 function increment() {
