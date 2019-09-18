@@ -28,6 +28,12 @@ document.getElementById("display").innerHTML =
 function increment() {
   neutrinos = neutrinos.plus(building1.times(multiplier1)).plus(1);
   building1 = building1.plus(building2.times(multiplier2))
+  building2 = building2.plus(building3.times(multiplier3))
+  building3 = building3.plus(building4.times(multiplier4))
+  building4 = building4.plus(building5.times(multiplier5))
+  building5 = building5.plus(building6.times(multiplier6))
+  building6 = building6.plus(building7.times(multiplier7))
+  building7 = building7.plus(building8.times(multiplier8))
   document.getElementById("display").innerHTML =
 "You have " + neutrinos + " neutrinos.";
 document.getElementById("building1").innerHTML = "You have " + building1 + " 1st buildings." + " x" + multiplier1 + ", " + cost1;
